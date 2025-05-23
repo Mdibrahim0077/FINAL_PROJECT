@@ -841,10 +841,10 @@ def create_key_pair():
         buffer.seek(0)
         
         # Generate sharing links for different platforms
-        whatsapp_url = f"https://wa.me/?text={urllib.parse.quote('I\'ve shared a public encryption key with you. Access it here: ' + direct_url)}"
-        telegram_url = f"https://t.me/share/url?url={urllib.parse.quote(direct_url)}&text={urllib.parse.quote('I\'ve shared a public encryption key with you.')}"
+        whatsapp_url = f"https://wa.me/?text={urllib.parse.quote("I have shared a public encryption key with you. Access it here: " + direct_url)}"
+        telegram_url = f"https://t.me/share/url?url={urllib.parse.quote(direct_url)}&text={urllib.parse.quote('I have shared a public encryption key with you.')}"
         email_subject = "Public Encryption Key from SecureVault"
-        email_body = f"I've shared a public encryption key with you. Access it here: {direct_url}"
+        email_body = f"I have shared a public encryption key with you. Access it here: {direct_url}"
         email_url = f"mailto:?subject={urllib.parse.quote(email_subject)}&body={urllib.parse.quote(email_body)}"
         
         # Return sharing information
