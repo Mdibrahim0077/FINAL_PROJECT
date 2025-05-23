@@ -1,0 +1,134 @@
+/* Theme System for SecureVault */
+
+/* Light theme (default) */
+.light-theme {
+  /* Theme Colors - Light Mode */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --border-color: #e2e8f0;
+  --card-bg: #ffffff;
+  --card-shadow-color: rgba(0, 0, 0, 0.07);
+  --accent-gradient: linear-gradient(135deg, #4f46e5, #818cf8);
+  --hover-bg: #f1f5f9;
+  
+  /* Form elements */
+  --input-bg: #ffffff;
+  --input-border: #e2e8f0;
+  --input-text: #1e293b;
+  --input-placeholder: #94a3b8;
+  
+  /* File upload */
+  --upload-bg: #f8fafc;
+  --upload-border: #e2e8f0;
+  --upload-text: #475569;
+  
+  /* Table colors */
+  --table-header-bg: #f8fafc;
+  --table-row-even: #f8fafc;
+  --table-border: #e2e8f0;
+}
+
+/* Dark theme */
+.dark-theme {
+  /* Theme Colors - Dark Mode */
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --border-color: #374151;
+  --card-bg: #1f2937;
+  --card-shadow-color: rgba(0, 0, 0, 0.3);
+  --accent-gradient: linear-gradient(135deg, #6366f1, #818cf8);
+  --hover-bg: #2d3748;
+  
+  /* Form elements */
+  --input-bg: #1f2937;
+  --input-border: #374151;
+  --input-text: #f3f4f6;
+  --input-placeholder: #9ca3af;
+  
+  /* File upload */
+  --upload-bg: #1f2937;
+  --upload-border: #374151;
+  --upload-text: #d1d5db;
+  
+  /* Table colors */
+  --table-header-bg: #1f2937;
+  --table-row-even: #2d3748;
+  --table-border: #374151;
+}
+
+/* Theme toggle button styles */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Custom styles for light/dark mode specific elements */
+.dark-theme .card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.dark-theme .file-upload {
+  background-color: var(--upload-bg);
+  border-color: var(--upload-border);
+}
+
+.dark-theme .file-upload-text {
+  color: var(--upload-text);
+}
+
+.dark-theme .comparison-table th {
+  background-color: var(--table-header-bg);
+}
+
+.dark-theme .comparison-table tr:nth-child(even) {
+  background-color: var(--table-row-even);
+}
+
+.dark-theme .comparison-table th, 
+.dark-theme .comparison-table td {
+  border-color: var(--table-border);
+}
+
+.dark-theme select, 
+.dark-theme input[type="text"],
+.dark-theme input[type="password"] {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border-color: var(--input-border);
+}
+
+.dark-theme select:focus, 
+.dark-theme input[type="text"]:focus,
+.dark-theme input[type="password"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.dark-theme .encryption-method {
+  background-color: var(--card-bg);
+} 

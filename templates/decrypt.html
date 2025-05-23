@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureVault - Decrypt Files</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/themes.css">
+    <style>
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-10);
+            cursor: pointer;
+            background-color: var(--upload-bg);
+        }
+        
+        .result-container {
+            margin-top: var(--space-6);
+            padding: var(--space-6);
+            background-color: var(--success-light);
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--success);
+        }
+        
+        .file-input-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/dashboard" class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                </svg>
+                SecureVault
+            </a>
+            
+            <div class="user-info">
+                <span class="welcome-text">Welcome, {{ username }}</span>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle dark/light mode">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="nav-container">
+        <nav class="navigation">
+            <a href="/encrypt" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon lock-icon">
+                    <defs>
+                        <linearGradient id="navLockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#6366F1" />
+                            <stop offset="70%" stop-color="#4F46E5" />
+                            <stop offset="100%" stop-color="#4338CA" />
+                        </linearGradient>
+                        <filter id="navLockGlow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="1" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        <radialGradient id="navLockHighlight" cx="70%" cy="30%" r="50%">
+                            <stop offset="0%" stop-color="rgba(255, 255, 255, 0.8)" />
+                            <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                        </radialGradient>
+                        <animate attributeName="r" from="50%" to="70%" dur="2s" repeatCount="indefinite" />
+                    </defs>
+                    <path d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" fill="url(#navLockGradient)" filter="url(#navLockGlow)" />
+                </svg>
+                Encrypt
+            </a>
+            <a href="/decrypt" class="nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon unlock-icon">
+                    <defs>
+                        <linearGradient id="navUnlockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#10B981" />
+                            <stop offset="70%" stop-color="#059669" />
+                            <stop offset="100%" stop-color="#047857" />
+                        </linearGradient>
+                        <filter id="navUnlockGlow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="1" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        <radialGradient id="navUnlockHighlight" cx="70%" cy="30%" r="50%">
+                            <stop offset="0%" stop-color="rgba(255, 255, 255, 0.8)" />
+                            <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                        </radialGradient>
+                        <animate attributeName="r" from="50%" to="70%" dur="2s" repeatCount="indefinite" />
+                    </defs>
+                    <path d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 01-1.5 0V6.75a3.75 3.75 0 10-7.5 0v3a3 3 0 013 3v6.75a3 3 0 01-3 3H3.75a3 3 0 01-3-3v-6.75a3 3 0 013-3h9v-3c0-2.9 2.35-5.25 5.25-5.25z" fill="url(#navUnlockGradient)" filter="url(#navUnlockGlow)" />
+                    <path class="unlock-highlight" d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 01-1.5 0V6.75a3.75 3.75 0 10-7.5 0v3a3 3 0 013 3v6.75a3 3 0 01-3 3H3.75a3 3 0 01-3-3v-6.75a3 3 0 013-3h9v-3c0-2.9 2.35-5.25 5.25-5.25z" fill="url(#navUnlockHighlight)" opacity="0.6" />
+                </svg>
+                Decrypt
+            </a>
+            <a href="/keys" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon key-icon">
+                    <defs>
+                        <linearGradient id="navKeyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FFD547" />
+                            <stop offset="70%" stop-color="#FF9900" />
+                            <stop offset="100%" stop-color="#FF7A00" />
+                        </linearGradient>
+                        <linearGradient id="navKeyRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FFE8B0" />
+                            <stop offset="100%" stop-color="#FFCC66" />
+                        </linearGradient>
+                        <filter id="navKeyGlow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="1" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        <radialGradient id="navKeyHighlight" cx="70%" cy="30%" r="50%">
+                            <stop offset="0%" stop-color="rgba(255, 255, 255, 0.8)" />
+                            <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                        </radialGradient>
+                        <animate attributeName="r" from="50%" to="70%" dur="2s" repeatCount="indefinite" />
+                    </defs>
+                    <path d="M15.75 1.5c-2.53 0-4.58 2.05-4.58 4.58 0 .45.07.89.19 1.3l-7.22 7.22c-.16.16-.25.38-.25.61v3.04c0 .48.39.86.86.86h2.18v-2.18c0-.48.39-.86.86-.86h2.18v-2.18c0-.48.39-.86.86-.86h1.32l2.14-2.14c.6.25 1.26.39 1.95.39 2.53 0 4.58-2.05 4.58-4.58S18.28 1.5 15.75 1.5zm2.15 6.73c-.79.79-2.07.79-2.86 0-.79-.79-.79-2.07 0-2.86.79-.79 2.07-.79 2.86 0 .79.79.79 2.07 0 2.86z" fill="url(#navKeyGradient)" filter="url(#navKeyGlow)" />
+                    <path d="M17.9 7.19c.39-.39.39-1.03 0-1.42-.39-.39-1.03-.39-1.42 0-.39.39-.39 1.03 0 1.42.39.4 1.03.39 1.42 0z" fill="url(#navKeyRingGradient)" />
+                    <path class="key-highlight" d="M15.75 1.5c-2.53 0-4.58 2.05-4.58 4.58 0 .45.07.89.19 1.3l-7.22 7.22c-.16.16-.25.38-.25.61v3.04c0 .48.39.86.86.86h2.18v-2.18c0-.48.39-.86.86-.86h2.18v-2.18c0-.48.39-.86.86-.86h1.32l2.14-2.14c.6.25 1.26.39 1.95.39 2.53 0 4.58-2.05 4.58-4.58S18.28 1.5 15.75 1.5z" fill="url(#navKeyHighlight)" opacity="0.6" />
+                </svg>
+                Keys
+            </a>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Decrypt File</h1>
+            <a href="/dashboard" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+        
+        <div class="card form-container">
+            <h2 class="form-title">Decrypt a File</h2>
+            <p>Upload an encrypted file and provide the password or private key to decrypt it.</p>
+            
+            <form id="decrypt-form">
+                <div class="form-group">
+                    <label>Select Encrypted File</label>
+                    <div id="file-upload-area" class="file-upload">
+                        <div class="file-upload-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16" class="upload-icon-svg">
+                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                            </svg>
+                        </div>
+                        <div class="file-upload-text">
+                            <p>Drag and drop your encrypted file here or <span>click to browse</span></p>
+                            <p class="text-small">Upload a file with .enc extension</p>
+                        </div>
+                        <input type="file" id="decrypt-file" name="file" class="file-input-hidden" required>
+                    </div>
+                    <div id="selected-file-name" style="display: none;"></div>
+                </div>
+                
+                <div class="form-group" id="decrypt-password-group">
+                    <label for="decrypt-password">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="decrypt-password" name="password" class="password-input" placeholder="Enter your decryption password">
+                        <button type="button" id="toggle-password" class="password-toggle" title="Show password" onclick="togglePasswordVisibility('decrypt-password', 'toggle-password')">
+                            <span class="eye-icon eye-show">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                </svg>
+                            </span>
+                            <span class="eye-icon eye-hide" style="display: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                                    <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="decrypt-key-group" style="display: none;">
+                    <label for="decrypt-key">Private Key</label>
+                    <select id="decrypt-key" name="key_id" class="form-control">
+                        <option value="">Select a private key...</option>
+                        <!-- Keys will be populated dynamically -->
+                    </select>
+                </div>
+                
+                <div class="form-group" id="decrypt-key-password-group" style="display: none;">
+                    <label for="decrypt-key-password">Private Key Password</label>
+                    <div class="password-container">
+                        <input type="password" id="decrypt-key-password" name="key_password" class="password-input" placeholder="Enter private key password">
+                        <button type="button" id="toggle-key-password" class="password-toggle" title="Show password" onclick="togglePasswordVisibility('decrypt-key-password', 'toggle-key-password')">
+                            <span class="eye-icon eye-show">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                </svg>
+                            </span>
+                            <span class="eye-icon eye-hide" style="display: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                                    <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Decrypt File</button>
+                </div>
+            </form>
+            
+            
+        </div>
+    </div>
+    
+    <script src="/static/js/script.js"></script>
+    <script src="/static/js/theme.js"></script>
+    
+    <footer class="app-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="decryption-instructions">
+                    <h3>Decryption Instructions</h3>
+                    <div class="instruction-card">
+                        <div class="instruction-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Upload Encrypted File</h4>
+                                    <p>Select the encrypted file (with .enc extension) that you want to decrypt. Drag and drop or click to browse.</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Identify Encryption Method</h4>
+                                    <p>The system will automatically detect if the file was encrypted with a password or a key.</p>
+                                    <p>For password-encrypted files, you'll need the password shared by the sender.</p>
+                                    <p>For key-encrypted files, you'll need your private key that matches the public key used for encryption.</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>Enter Password or Select Key</h4>
+                                    <p>For password decryption, enter the exact password provided by the sender.</p>
+                                    <p>For key decryption, select your private key and enter its password if required.</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h4>Decrypt and Download</h4>
+                                    <p>Click the Decrypt button and wait for the process to complete. You can then download the decrypted file.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="troubleshooting-tips">
+                            <h4>Troubleshooting Tips</h4>
+                            <ul>
+                                <li>If decryption fails, double-check the password for typos</li>
+                                <li>Ensure you're using the correct private key that matches the public key used for encryption</li>
+                                <li>Verify the file hasn't been modified or corrupted since encryption</li>
+                                <li>Contact the sender if you're having persistent issues</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2025 SecureVault. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <style>
+        .app-footer {
+            margin-top: var(--space-12);
+            padding: var(--space-8) 0;
+            background-color: var(--footer-bg, #f8fafc);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+        
+        .decryption-instructions h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: var(--space-4);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .decryption-instructions h3:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--success) 0%, var(--success-dark, #047857) 100%);
+            border-radius: 2px;
+        }
+        
+        .instruction-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: var(--space-6);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+        
+        @media (min-width: 768px) {
+            .instruction-card {
+                flex-direction: row;
+            }
+            
+            .instruction-steps {
+                flex: 3;
+            }
+            
+            .troubleshooting-tips {
+                flex: 1;
+                border-left: 1px solid var(--border-color);
+                padding-left: var(--space-6);
+            }
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: var(--space-5);
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark, #047857) 100%);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: var(--space-4);
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            margin: 0 0 var(--space-2) 0;
+            color: var(--text-primary);
+        }
+        
+        .step-content p {
+            margin: 0 0 var(--space-2) 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .troubleshooting-tips h4 {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: var(--space-3);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .troubleshooting-tips h4:after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--info, #3b82f6);
+            border-radius: 1.5px;
+        }
+        
+        .troubleshooting-tips ul {
+            padding-left: var(--space-5);
+            margin: var(--space-4) 0 0 0;
+        }
+        
+        .troubleshooting-tips li {
+            margin-bottom: var(--space-3);
+            color: var(--text-secondary);
+            position: relative;
+        }
+        
+        .troubleshooting-tips li:before {
+            content: '\2022';
+            color: var(--info, #3b82f6);
+            font-weight: bold;
+            position: absolute;
+            left: -15px;
+        }
+        
+        .footer-copyright {
+            margin-top: var(--space-6);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 0.875rem;
+        }
+        
+        /* Dark mode adjustments */
+        .dark-theme .app-footer {
+            background-color: var(--footer-bg, #1e293b);
+            color: var(--text-primary);
+        }
+        
+        .dark-theme .instruction-card {
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dark-theme .step-content h4,
+        .dark-theme .troubleshooting-tips h4 {
+            color: var(--text-primary);
+        }
+        
+        .dark-theme .step-content p,
+        .dark-theme .troubleshooting-tips li {
+            color: var(--text-secondary);
+        }
+        
+        .dark-theme .footer-copyright {
+            color: var(--text-tertiary);
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</body>
+</html> 

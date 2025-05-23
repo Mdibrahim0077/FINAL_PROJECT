@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureVault - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/themes.css">
+    <style>
+        .content-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+            margin: var(--space-6) 0;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: var(--space-6);
+        }
+        
+        .security-tips {
+            background-color: var(--primary-50);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            border-left: 4px solid var(--primary);
+            margin: var(--space-6) 0;
+        }
+        
+        .security-tips h3 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+        
+        .security-tips ul {
+            margin-bottom: 0;
+        }
+        
+        .note {
+            background-color: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            margin: var(--space-6) 0 0;
+        }
+        
+        .note p {
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .encrypt-card .card-icon svg {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        
+        .encrypt-card:hover .card-icon svg {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.3));
+        }
+        
+        .decrypt-card .card-icon svg {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        
+        .decrypt-card:hover .card-icon svg {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.3));
+        }
+        
+        .encrypt-card:hover .lock-highlight,
+        .decrypt-card:hover .unlock-highlight {
+            animation: shimmer 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <header class="app-header">
+        <div class="header-content">
+            <a href="/dashboard" class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" 
+                    d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                </svg>
+                SecureVault
+            </a>
+            
+            <div class="user-info">
+                <span class="welcome-text">Welcome, {{ username }}</span>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle dark/light mode">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="content-section">
+            <h1 class="page-title">SecureVault Dashboard</h1>
+            
+            <div class="card form-container">
+                <h2 class="form-title">Understanding Encryption</h2>
+                <p>Encryption is the process of converting information into a code to prevent unauthorized access. At SecureVault, we use industry-standard encryption algorithms to protect your sensitive data.</p>
+                
+                <div class="content-section">
+                    <h2 class="form-title">Choose an Action</h2>
+                    <div class="card-container">
+                        <a href="/encrypt" class="card feature-card encrypt-card">
+                            <div class="card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <defs>
+                                        <linearGradient id="lockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#6366F1" />
+                                            <stop offset="70%" stop-color="#4F46E5" />
+                                            <stop offset="100%" stop-color="#4338CA" />
+                                        </linearGradient>
+                                        <linearGradient id="lockBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#818CF8" />
+                                            <stop offset="100%" stop-color="#6366F1" />
+                                        </linearGradient>
+                                        <filter id="lockGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur stdDeviation="1" result="blur" />
+                                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                        </filter>
+                                        <radialGradient id="lockHighlight" cx="70%" cy="30%" r="50%">
+                                            <stop offset="0%" stop-color="rgba(255, 255, 255, 0.8)" />
+                                            <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                                        </radialGradient>
+                                    </defs>
+                                    <path d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" fill="url(#lockGradient)" filter="url(#lockGlow)" />
+                                    <path class="lock-highlight" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25z" fill="url(#lockHighlight)" opacity="0.6" />
+                                </svg>
+                            </div>
+                            <h3 class="card-title">Encrypt Files</h3>
+                            <p class="card-description">Secure your files with encryption to keep them private and protected</p>
+                        </a>
+                        
+                        <a href="/decrypt" class="card feature-card decrypt-card">
+                            <div class="card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <defs>
+                                        <linearGradient id="unlockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#10B981" />
+                                            <stop offset="70%" stop-color="#059669" />
+                                            <stop offset="100%" stop-color="#047857" />
+                                        </linearGradient>
+                                        <linearGradient id="unlockBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#34D399" />
+                                            <stop offset="100%" stop-color="#10B981" />
+                                        </linearGradient>
+                                        <filter id="unlockGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur stdDeviation="1" result="blur" />
+                                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                        </filter>
+                                        <radialGradient id="unlockHighlight" cx="70%" cy="30%" r="50%">
+                                            <stop offset="0%" stop-color="rgba(255, 255, 255, 0.8)" />
+                                            <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                                        </radialGradient>
+                                    </defs>
+                                    <path d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 01-1.5 0V6.75a3.75 3.75 0 10-7.5 0v3a3 3 0 013 3v6.75a3 3 0 01-3 3H3.75a3 3 0 01-3-3v-6.75a3 3 0 013-3h9v-3c0-2.9 2.35-5.25 5.25-5.25z" fill="url(#unlockGradient)" filter="url(#unlockGlow)" />
+                                    <path class="unlock-highlight" d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 01-1.5 0V6.75a3.75 3.75 0 10-7.5 0v3a3 3 0 013 3v6.75a3 3 0 01-3 3H3.75a3 3 0 01-3-3v-6.75a3 3 0 013-3h9v-3c0-2.9 2.35-5.25 5.25-5.25z" fill="url(#unlockHighlight)" opacity="0.6" />
+                                </svg>
+                            </div>
+                            <h3 class="card-title">Decrypt Files</h3>
+                            <p class="card-description">Retrieve your encrypted files safely and securely</p>
+                        </a>
+                        
+                        <a href="/keys" class="card feature-card keys-card">
+                            <div class="card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <defs>
+                                        <linearGradient id="keyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#FFD547" />
+                                            <stop offset="70%" stop-color="#FF9900" />
+                                            <stop offset="100%" stop-color="#FF7A00" />
+                                        </linearGradient>
+                                        <linearGradient id="keyRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#FFE8B0" />
+                                            <stop offset="100%" stop-color="#FFCC66" />
+                                        </linearGradient>
+                                        <filter id="keyGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur stdDeviation="1" result="blur" />
+                                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                        </filter>
+                                        <radialGradient id="keyHighlight" cx="70%" cy="30%" r="50%">
+                                            <stop offset="0%" stop-color="rgba(255, 255, 255, 0.8)" />
+                                            <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                                        </radialGradient>
+                                    </defs>
+                                    <path d="M15.75 1.5c-2.53 0-4.58 2.05-4.58 4.58 0 .45.07.89.19 1.3l-7.22 7.22c-.16.16-.25.38-.25.61v3.04c0 .48.39.86.86.86h2.18v-2.18c0-.48.39-.86.86-.86h2.18v-2.18c0-.48.39-.86.86-.86h1.32l2.14-2.14c.6.25 1.26.39 1.95.39 2.53 0 4.58-2.05 4.58-4.58S18.28 1.5 15.75 1.5zm2.15 6.73c-.79.79-2.07.79-2.86 0-.79-.79-.79-2.07 0-2.86.79-.79 2.07-.79 2.86 0 .79.79.79 2.07 0 2.86z" fill="url(#keyGradient)" filter="url(#keyGlow)" />
+                                    <path d="M17.9 7.19c.39-.39.39-1.03 0-1.42-.39-.39-1.03-.39-1.42 0-.39.39-.39 1.03 0 1.42.39.4 1.03.39 1.42 0z" fill="url(#keyRingGradient)" />
+                                    <path class="key-highlight" d="M15.75 1.5c-2.53 0-4.58 2.05-4.58 4.58 0 .45.07.89.19 1.3l-7.22 7.22c-.16.16-.25.38-.25.61v3.04c0 .48.39.86.86.86h2.18v-2.18c0-.48.39-.86.86-.86h2.18v-2.18c0-.48.39-.86.86-.86h1.32l2.14-2.14c.6.25 1.26.39 1.95.39 2.53 0 4.58-2.05 4.58-4.58S18.28 1.5 15.75 1.5z" fill="url(#keyHighlight)" opacity="0.6" />
+                                </svg>
+                            </div>
+                            <h3 class="card-title">Manage Keys</h3>
+                            <p class="card-description">Create and manage your encryption keys</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card form-container">
+                <h2 class="form-title">Encryption Technologies</h2>
+                
+                <div class="encryption-methods">
+                    <div class="encryption-method symmetric">
+                        <h3>AES-256-CBC (Symmetric Encryption)</h3>
+                        <p><strong>What is it?</strong> Advanced Encryption Standard (AES) is a symmetric encryption algorithm that uses the same key for both encryption and decryption.</p>
+                        
+                        <ul class="key-features">
+                            <li><strong>256-bit key length</strong> - Provides 2<sup>256</sup> possible combinations (more than the atoms in the universe)</li>
+                            <li><strong>Cipher Block Chaining (CBC)</strong> - Each block of data depends on the previous block, enhancing security</li>
+                            <li><strong>Government-approved</strong> - Used by the US government for protecting classified information</li>
+                        </ul>
+                        
+                        <p>When you encrypt a file with AES-256-CBC, your original file is transformed into a seemingly random sequence of data that can only be decoded with the correct encryption key.</p>
+                        
+                        <p>Think of it like a special lock box - if you have a 10-digit combination, there are 10 billion possible combinations. With AES-256, there are 2<sup>256</sup> possible combinations - a number so large it would take billions of years for even the most powerful computers to crack.</p>
+                    </div>
+                    
+                    <div class="encryption-method asymmetric">
+                        <h3>RSA-2048/4096 (Asymmetric Encryption)</h3>
+                        <p><strong>What is it?</strong> RSA is an asymmetric encryption system that uses two different but mathematically linked keys - a public key for encryption and a private key for decryption.</p>
+                        
+                        <ul class="key-features">
+                            <li><strong>Two different keys</strong> - Public key can be shared, private key must be kept secret</li>
+                            <li><strong>Based on the factoring problem</strong> - The difficulty of finding the prime factors of a large number</li>
+                            <li><strong>Perfect for secure communications</strong> - Allows secure communication without a pre-shared key</li>
+                        </ul>
+                        
+                        <p>RSA is like having a special mailbox with two keys - anyone can use the public key to put mail in, but only you with the private key can open it and read the contents.</p>
+                    </div>
+                </div>
+                
+                <h3>How SecureVault Combines These Technologies</h3>
+                <p>SecureVault uses a hybrid approach that leverages the strengths of both encryption types:</p>
+                <ul>
+                    <li>Your file is encrypted with AES-256-CBC for speed and security</li>
+                    <li>The AES key is then encrypted with RSA for secure key management</li>
+                    <li>This combination provides both security and performance</li>
+                </ul>
+                
+                <h3>Comparison of Encryption Methods</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>AES-256-CBC</th>
+                            <th>RSA-2048/4096</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Type</td>
+                            <td>Symmetric (same key)</td>
+                            <td>Asymmetric (public/private keys)</td>
+                        </tr>
+                        <tr>
+                            <td>Speed</td>
+                            <td>Very fast</td>
+                            <td>Slower</td>
+                        </tr>
+                        <tr>
+                            <td>Key Length</td>
+                            <td>256 bits</td>
+                            <td>2048 or 4096 bits</td>
+                        </tr>
+                        <tr>
+                            <td>Best Use</td>
+                            <td>Large data encryption</td>
+                            <td>Key exchange, authentication</td>
+                        </tr>
+                        <tr>
+                            <td>Security Level</td>
+                            <td>Very high</td>
+                            <td>Very high</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="security-tips">
+                    <h3>Practical Security Tips</h3>
+                    <ul>
+                        <li><strong>Use strong passwords</strong> - At least 12 characters with a mix of letters, numbers, and symbols</li>
+                        <li><strong>Enable two-factor authentication</strong> - Adds an extra layer of security</li>
+                        <li><strong>Keep your keys safe</strong> - Store private keys securely and never share them</li>
+                        <li><strong>Encrypt sensitive data</strong> - Especially when sharing over the internet</li>
+                        <li><strong>Regularly update software</strong> - To protect against known vulnerabilities</li>
+                    </ul>
+                </div>
+                
+                <div class="encryption-instructions-container">
+                    <div class="instruction-tabs">
+                        <button class="tab-btn active" data-tab="encrypt-tab">Encryption Instructions</button>
+                        <button class="tab-btn" data-tab="decrypt-tab">Decryption Instructions</button>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <div id="encrypt-tab" class="tab-pane active">
+                            <div class="instruction-card">
+                                <div class="instruction-steps">
+                                    <div class="step">
+                                        <div class="step-number">1</div>
+                                        <div class="step-content">
+                                            <h4>Select a File</h4>
+                                            <p>Choose any file you want to encrypt. Drag and drop or click to browse your files.</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">2</div>
+                                        <div class="step-content">
+                                            <h4>Choose Encryption Method</h4>
+                                            <p><strong>Symmetric (Password):</strong> Use a password that you'll need to share securely with the recipient.</p>
+                                            <p><strong>Asymmetric (Public Key):</strong> Use someone's public key to encrypt. Only their private key can decrypt it.</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <div class="step-content">
+                                            <h4>Set Password or Select Key</h4>
+                                            <p>For password encryption, create a strong password with a mix of letters, numbers, and symbols.</p>
+                                            <p>For key encryption, select the recipient's public key from your stored keys.</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">4</div>
+                                        <div class="step-content">
+                                            <h4>Encrypt and Share</h4>
+                                            <p>Click the Encrypt button and wait for the process to complete. You can then download the encrypted file or generate sharing links.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="security-tips instruction-tips">
+                                    <h4>Security Tips</h4>
+                                    <ul>
+                                        <li>Never share the password in the same channel as the encrypted file</li>
+                                        <li>Use a different secure channel to share the password</li>
+                                        <li>Consider using asymmetric encryption for better security</li>
+                                        <li>Delete the original file if it contains sensitive information</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="decrypt-tab" class="tab-pane">
+                            <div class="instruction-card">
+                                <div class="instruction-steps">
+                                    <div class="step">
+                                        <div class="step-number">1</div>
+                                        <div class="step-content">
+                                            <h4>Upload Encrypted File</h4>
+                                            <p>Select the encrypted file (with .enc extension) that you want to decrypt. Drag and drop or click to browse.</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">2</div>
+                                        <div class="step-content">
+                                            <h4>Identify Encryption Method</h4>
+                                            <p>The system will automatically detect if the file was encrypted with a password or a key.</p>
+                                            <p>For password-encrypted files, you'll need the password shared by the sender.</p>
+                                            <p>For key-encrypted files, you'll need your private key that matches the public key used for encryption.</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <div class="step-content">
+                                            <h4>Enter Password or Select Key</h4>
+                                            <p>For password decryption, enter the exact password provided by the sender.</p>
+                                            <p>For key decryption, select your private key and enter its password if required.</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">4</div>
+                                        <div class="step-content">
+                                            <h4>Decrypt and Download</h4>
+                                            <p>Click the Decrypt button and wait for the process to complete. You can then download the decrypted file.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="troubleshooting-tips instruction-tips">
+                                    <h4>Troubleshooting Tips</h4>
+                                    <ul>
+                                        <li>If decryption fails, double-check the password for typos</li>
+                                        <li>Ensure you're using the correct private key that matches the public key used for encryption</li>
+                                        <li>Verify the file hasn't been modified or corrupted since encryption</li>
+                                        <li>Contact the sender if you're having persistent issues</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <p><strong>Remember:</strong> Encryption is only as secure as your key management. Always protect your encryption keys and passwords.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/script.js"></script>
+    <script src="/static/js/theme.js"></script>
+    
+    <style>
+        /* Instruction Tabs Styles */
+        .encryption-instructions-container {
+            margin-top: var(--space-8);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        .instruction-tabs {
+            display: flex;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab-btn {
+            padding: var(--space-3) var(--space-6);
+            background: none;
+            border: none;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+            background-color: var(--bg-primary);
+        }
+        
+        .tab-btn.active:first-child::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .tab-btn.active:last-child::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--success);
+        }
+        
+        .tab-content {
+            background-color: var(--bg-primary);
+            padding: var(--space-6);
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        /* Instruction Card Styles */
+        .instruction-card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+        
+        @media (min-width: 768px) {
+            .instruction-card {
+                flex-direction: row;
+            }
+            
+            .instruction-steps {
+                flex: 3;
+            }
+            
+            .instruction-tips {
+                flex: 1;
+                border-left: 1px solid var(--border-color);
+                padding-left: var(--space-6);
+            }
+        }
+        
+        /* Step Styles */
+        .step {
+            display: flex;
+            margin-bottom: var(--space-5);
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: var(--space-4);
+            flex-shrink: 0;
+            color: white;
+        }
+        
+        #encrypt-tab .step-number {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        
+        #decrypt-tab .step-number {
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark, #047857) 100%);
+        }
+        
+        .step-content h4 {
+            margin: 0 0 var(--space-2) 0;
+            color: var(--text-primary);
+        }
+        
+        .step-content p {
+            margin: 0 0 var(--space-2) 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        /* Tips Styles */
+        .instruction-tips h4 {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: var(--space-3);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .instruction-tips h4:after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            border-radius: 1.5px;
+        }
+        
+        .security-tips h4:after {
+            background-color: var(--warning);
+        }
+        
+        .troubleshooting-tips h4:after {
+            background-color: var(--info, #3b82f6);
+        }
+        
+        .instruction-tips ul {
+            padding-left: var(--space-5);
+            margin: var(--space-4) 0 0 0;
+        }
+        
+        .instruction-tips li {
+            margin-bottom: var(--space-3);
+            color: var(--text-secondary);
+            position: relative;
+        }
+        
+        .security-tips li:before {
+            content: '\2022';
+            color: var(--warning);
+            font-weight: bold;
+            position: absolute;
+            left: -15px;
+        }
+        
+        .troubleshooting-tips li:before {
+            content: '\2022';
+            color: var(--info, #3b82f6);
+            font-weight: bold;
+            position: absolute;
+            left: -15px;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons and panes
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabPanes.forEach(p => p.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Show corresponding tab pane
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
