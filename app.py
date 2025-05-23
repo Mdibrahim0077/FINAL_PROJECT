@@ -16,6 +16,10 @@ from datetime import datetime
 import sqlite3
 from functools import wraps
 
+# Create necessary folders
+for folder in ['uploads', 'encrypted', 'decrypted', 'keys']:
+    os.makedirs(folder, exist_ok=True)
+
 # Configuration
 UPLOAD_FOLDER, ENCRYPTED_FOLDER = 'uploads', 'encrypted'
 DECRYPTED_FOLDER, KEYS_FOLDER = 'decrypted', 'keys'
